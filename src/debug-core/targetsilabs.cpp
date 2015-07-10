@@ -174,7 +174,8 @@ void TargetSiLabs::run_to_bp(int ignore_cnt)
 		ec2_target_go(&obj);
 		while( !ec2_target_halt_poll( &obj ) )
 		{
-			usleep(250);
+			const struct timespec delay_250us = { 0, 250000 };
+			nanosleep(&delay_250us, NULL);
 			if(!running)
 			{
 				ec2_target_halt(&obj);

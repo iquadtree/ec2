@@ -194,6 +194,8 @@ bool test_data_ram( EC2DRV &obj )
 	bool pass;
 	bool test_pass = true;
 	
+	const struct timespec delay_1s = { 1, 0 };
+
 	print_test("DATA RAM");
 	print_subtest("write / read 0x00");
 	memset( write_buf, 0, sizeof(write_buf) );
@@ -281,7 +283,7 @@ bool test_data_ram( EC2DRV &obj )
 		print_result(pass);
 	}
 	test_pass &= pass;
-	usleep(1000000);
+	nanosleep(&delay_1s, NULL);
 	print_subtest("write / read even addr");
 	for( int i=0; i<=0xff; i+=2 )
 	{
@@ -881,6 +883,10 @@ bool test_debug( EC2DRV &obj )
 	const uint32_t BP_3 = 0x0002;
 	bool test_pass=true, pass;
 	
+	const struct timespec delay_1s    = { 1, 0 };
+	const struct timespec delay_10s   = { 10, 0 };
+	const struct timespec delay_100ms = { 0, 100000000L };
+
 	print_test("Debug operations");
 	print_subtest("Load program");
 	pass = ec2_write_flash_auto_erase( &obj, program, 0x0000, sizeof(program) );
@@ -903,7 +909,7 @@ bool test_debug( EC2DRV &obj )
 	print_subtest("Run to BP");
 	ec2_target_go(&obj);
 
-	usleep(1000000);	// allow time to reach breakpoint
+	nanosleep(&delay_1s, NULL);	// allow time to reach breakpoint
 	pass = ec2_target_halt_poll(&obj);
 	pass &= ec2_read_pc(&obj)==BP_0;
 	print_result(pass);
@@ -911,7 +917,7 @@ bool test_debug( EC2DRV &obj )
 	
 	print_subtest("Run to BP again");
 	ec2_target_go(&obj);
-	usleep(100000);	// allow time to reach breakpoint
+	nanosleep(&delay_100ms, NULL);	// allow time to reach breakpoint
 	pass = ec2_target_halt_poll(&obj);
 	pass &= ec2_read_pc(&obj)==BP_0;
 	print_result(pass);
@@ -926,19 +932,19 @@ bool test_debug( EC2DRV &obj )
 	//ec2_target_reset(&obj);	/// @FIXME I think targetreset kills the breakpoints!
 	ec2_set_pc(&obj,0x0000);	/// @FIXME this should be part of target reset!
 	ec2_target_go(&obj);
-	usleep(1000000);	// allow time to reach breakpoint
+	nanosleep(&delay_1s, NULL);	// allow time to reach breakpoint
 	pass = ec2_target_halt_poll(&obj);
 	pass &= ec2_read_pc(&obj)==BP_0;
 	ec2_target_go(&obj);
-	usleep(1000000);	// allow time to reach breakpoint
+	nanosleep(&delay_1s, NULL);	// allow time to reach breakpoint
 	pass &= ec2_target_halt_poll(&obj);
 	pass &= ec2_read_pc(&obj)==BP_1;
 	ec2_target_go(&obj);
-	usleep(1000000);	// allow time to reach breakpoint
+	nanosleep(&delay_1s, NULL);	// allow time to reach breakpoint
 	pass = ec2_target_halt_poll(&obj);
 	pass &= ec2_read_pc(&obj)==BP_0;
 	ec2_target_go(&obj);
-	usleep(1000000);	// allow time to reach breakpoint
+	nanosleep(&delay_1s, NULL);	// allow time to reach breakpoint
 	pass &= ec2_target_halt_poll(&obj);
 	pass &= ec2_read_pc(&obj)==BP_1;
 	print_result(pass);
@@ -952,27 +958,27 @@ bool test_debug( EC2DRV &obj )
 	print_subtest("Test with 3 BP's");
 	ec2_set_pc(&obj,0x0000);	/// @FIXME this should be part of target reset!
 	ec2_target_go(&obj);
-	usleep(100000);	// allow time to reach breakpoint
+	nanosleep(&delay_100ms, NULL);	// allow time to reach breakpoint
 	pass = ec2_target_halt_poll(&obj);
 	pass &= ec2_read_pc(&obj)==BP_0;
 	ec2_target_go(&obj);
-	usleep(100000);	// allow time to reach breakpoint
+	nanosleep(&delay_100ms, NULL);	// allow time to reach breakpoint
 	pass &= ec2_target_halt_poll(&obj);
 	pass &= ec2_read_pc(&obj)==BP_1;
 	ec2_target_go(&obj);
-	usleep(100000);	// allow time to reach breakpoint
+	nanosleep(&delay_100ms, NULL);	// allow time to reach breakpoint
 	pass &= ec2_target_halt_poll(&obj);
 	pass &= ec2_read_pc(&obj)==BP_2;
 	ec2_target_go(&obj);
-	usleep(100000);	// allow time to reach breakpoint
+	nanosleep(&delay_100ms, NULL);	// allow time to reach breakpoint
 	pass &= ec2_target_halt_poll(&obj);
 	pass &= ec2_read_pc(&obj)==BP_0;
 	ec2_target_go(&obj);
-	usleep(100000);	// allow time to reach breakpoint
+	nanosleep(&delay_100ms, NULL);	// allow time to reach breakpoint
 	pass &= ec2_target_halt_poll(&obj);
 	pass &= ec2_read_pc(&obj)==BP_1;
 	ec2_target_go(&obj);
-	usleep(100000);	// allow time to reach breakpoint
+	nanosleep(&delay_100ms, NULL);	// allow time to reach breakpoint
 	pass &= ec2_target_halt_poll(&obj);
 	pass &= ec2_read_pc(&obj)==BP_2;
 	print_result(pass);
@@ -988,31 +994,31 @@ bool test_debug( EC2DRV &obj )
 	
 	ec2_set_pc(&obj,0x0000);	/// @FIXME this should be part of target reset!
 	ec2_target_go(&obj);
-	usleep(100000);	// allow time to reach breakpoint
+	nanosleep(&delay_100ms, NULL);	// allow time to reach breakpoint
 	pass = ec2_target_halt_poll(&obj);
 	pass &= ec2_read_pc(&obj)==BP_3;
 	ec2_target_go(&obj);
-	usleep(100000);	// allow time to reach breakpoint
+	nanosleep(&delay_100ms, NULL);	// allow time to reach breakpoint
 	pass &= ec2_target_halt_poll(&obj);
 	pass &= ec2_read_pc(&obj)==BP_0;
 	ec2_target_go(&obj);
-	usleep(100000);	// allow time to reach breakpoint
+	nanosleep(&delay_100ms, NULL);	// allow time to reach breakpoint
 	pass &= ec2_target_halt_poll(&obj);
 	pass &= ec2_read_pc(&obj)==BP_1;
 	ec2_target_go(&obj);
-	usleep(100000);	// allow time to reach breakpoint
+	nanosleep(&delay_100ms, NULL);	// allow time to reach breakpoint
 	pass &= ec2_target_halt_poll(&obj);
 	pass &= ec2_read_pc(&obj)==BP_2;
 	ec2_target_go(&obj);
-	usleep(100000);	// allow time to reach breakpoint
+	nanosleep(&delay_100ms, NULL);	// allow time to reach breakpoint
 	pass &= ec2_target_halt_poll(&obj);
 	pass &= ec2_read_pc(&obj)==BP_0;
 	ec2_target_go(&obj);
-	usleep(100000);	// allow time to reach breakpoint
+	nanosleep(&delay_100ms, NULL);	// allow time to reach breakpoint
 	pass &= ec2_target_halt_poll(&obj);
 	pass &= ec2_read_pc(&obj)==BP_1;
 	ec2_target_go(&obj);
-	usleep(100000);	// allow time to reach breakpoint
+	nanosleep(&delay_100ms, NULL);	// allow time to reach breakpoint
 	pass &= ec2_target_halt_poll(&obj);
 	pass &= ec2_read_pc(&obj)==BP_2;
 	print_result(pass);
@@ -1028,19 +1034,19 @@ bool test_debug( EC2DRV &obj )
 	//ec2_target_reset(&obj);	/// @FIXME I think targetreset kills the breakpoints!
 	ec2_set_pc(&obj,0x0000);	/// @FIXME this should be part of target reset!
 	ec2_target_go(&obj);
-	usleep(1000000);	// allow time to reach breakpoint
+	nanosleep(&delay_1s, NULL);	// allow time to reach breakpoint
 	pass = ec2_target_halt_poll(&obj);
 	pass &= ec2_read_pc(&obj)==BP_0;
 	ec2_target_go(&obj);
-	usleep(1000000);	// allow time to reach breakpoint
+	nanosleep(&delay_1s, NULL);	// allow time to reach breakpoint
 	pass &= ec2_target_halt_poll(&obj);
 	pass &= ec2_read_pc(&obj)==BP_2;
 	ec2_target_go(&obj);
-	usleep(1000000);	// allow time to reach breakpoint
+	nanosleep(&delay_1s, NULL);	// allow time to reach breakpoint
 	pass = ec2_target_halt_poll(&obj);
 	pass &= ec2_read_pc(&obj)==BP_0;
 	ec2_target_go(&obj);
-	usleep(1000000);	// allow time to reach breakpoint
+	nanosleep(&delay_1s, NULL);	// allow time to reach breakpoint
 	pass &= ec2_target_halt_poll(&obj);
 	pass &= ec2_read_pc(&obj)==BP_2;
 	print_result(pass);
@@ -1050,7 +1056,7 @@ bool test_debug( EC2DRV &obj )
 	ec2_clear_all_bp(&obj);
 	ec2_set_pc(&obj,0x0000);	/// @FIXME this should be part of target reset!
 	ec2_target_go(&obj);
-	usleep(10000000);			// allow time to reach breakpoint if still present
+	nanosleep(&delay_10s, NULL);	// allow time to reach breakpoint
 	pass &= !ec2_target_halt_poll(&obj);	// only pass if still running
 	print_result(pass);
 	test_pass &= pass;
